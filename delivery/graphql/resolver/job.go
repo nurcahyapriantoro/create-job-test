@@ -1,59 +1,67 @@
 package resolver
 
 import (
+	"context"
+
 	_dataloader "jobqueue/delivery/graphql/dataloader"
-	"jobqueue/entity"
 	_interface "jobqueue/interface"
 )
 
 type JobResolver struct {
-	Data       entity.Job
+	JobID      string
 	JobService _interface.JobService
 	Dataloader *_dataloader.GeneralDataloader
 }
 
 type JobStatusResolver struct {
-	Data       entity.JobStatus
 	JobService _interface.JobService
 	Dataloader *_dataloader.GeneralDataloader
 }
 
-// ID ....
 func (q JobResolver) ID() string {
-	return q.Data.ID
+	return q.JobID
 }
 
-// Task ....
 func (q JobResolver) Task() string {
-	return q.Data.Task
+	job, err := q.JobService.FindByID(context.Background(), q.JobID)
+	if err != nil {
+		return ""
+	}
+	return job.Task
 }
 
-// Status ....
 func (q JobResolver) Status() string {
-	return q.Data.Status
+	job, err := q.JobService.FindByID(context.Background(), q.JobID)
+	if err != nil {
+		return ""
+	}
+	return job.Status
 }
 
-// Attempts ....
 func (q JobResolver) Attempts() int32 {
-	return q.Data.Attempts
+	job, err := q.JobService.FindByID(context.Background(), q.JobID)
+	if err != nil {
+		return 0
+	}
+	return job.Attempts
 }
 
-// Pending ...
 func (t JobStatusResolver) Pending() int32 {
-	return t.Data.Pending
+	status, _ := t.JobService.GetJobStatus(context.Background())
+	return status.Pending
 }
 
-// Running ...
 func (t JobStatusResolver) Running() int32 {
-	return t.Data.Running
+	status, _ := t.JobService.GetJobStatus(context.Background())
+	return status.Running
 }
 
-// Failed ...
 func (t JobStatusResolver) Failed() int32 {
-	return t.Data.Failed
+	status, _ := t.JobService.GetJobStatus(context.Background())
+	return status.Failed
 }
 
-// Completed ...
 func (t JobStatusResolver) Completed() int32 {
-	return t.Data.Completed
+	status, _ := t.JobService.GetJobStatus(context.Background())
+	return status.Completed
 }

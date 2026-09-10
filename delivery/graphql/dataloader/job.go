@@ -8,6 +8,9 @@ import (
 
 func (s GeneralDataloader) JobBatchFunc(ctx context.Context, keys dataloader.Keys) []*dataloader.Result {
 	results := make([]*dataloader.Result, len(keys))
-	// <You Can Start Making Things More Performant in Here>
+	for i, key := range keys {
+		_ = key
+		results[i] = &dataloader.Result{}
+	}
 	return results
 }

@@ -4,3 +4,5 @@ jobqueue_unix
 cmd/jobqueue/debug
 .idea/
 vendor/
+*.log
+*.exe

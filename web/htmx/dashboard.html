@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Job Queue Dashboard — HTMX</title>
+  <script src="//unpkg.com/htmx.org@1.9.12"></script>
+  <style>
+    body { font-family: sans-serif; max-width: 960px; margin: 40px auto; padding: 0 20px; color: #222; }
+    h1 { margin-bottom: 8px; }
+    h2 { margin-top: 32px; border-bottom: 1px solid #eee; padding-bottom: 4px; }
+    button { padding: 8px 14px; cursor: pointer; font-size: 0.95rem; margin-right: 6px; }
+    input[type=text] { padding: 6px 8px; font-size: 0.95rem; }
+    label { display: inline-block; min-width: 50px; }
+    .row { margin: 12px 0; }
+    .badges { display: flex; gap: 12px; }
+    .badge { padding: 8px 14px; border-radius: 6px; font-weight: 600; min-width: 90px; text-align: center; }
+    .badge.pending { background: #fef3c7; color: #92400e; }
+    .badge.running { background: #dbeafe; color: #1e40af; }
+    .badge.failed { background: #fee2e2; color: #991b1b; }
+    .badge.completed { background: #d1fae5; color: #065f46; }
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+    th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #eee; font-size: 0.92rem; }
+    th { background: #f9fafb; }
+    .view-btn { padding: 4px 10px; font-size: 0.85rem; }
+    #job-detail { padding: 12px; background: #f9fafb; border-radius: 6px; min-height: 40px; }
+    .form-row { display: flex; gap: 8px; align-items: center; margin: 4px 0; }
+  </style>
+</head>
+<body>
+  <h1>Job Queue Dashboard</h1>
+  <p>Server-rendered HTMX view of the in-memory job queue.</p>
+
+  <h2>Action Bar</h2>
+  <div class="row">
+    <button
+      hx-post="/jobqueue/dashboard/jobs/create"
+      hx-include="#vars-form"
+      hx-target="#jobs-table"
+      hx-swap="outerHTML"
+    >Create 3 Jobs</button>
+
+    <button
+      hx-post="/jobqueue/dashboard/jobs/unstable"
+      hx-target="#jobs-table"
+      hx-swap="outerHTML"
+    >Create Unstable Job</button>
+
+    <button
+      hx-get="/jobqueue/dashboard/status"
+      hx-target="#status-summary"
+      hx-swap="outerHTML"
+    >Refresh Status</button>
+
+    <button
+      hx-get="/jobqueue/dashboard/jobs"
+      hx-target="#jobs-table"
+      hx-swap="outerHTML"
+    >Refresh Jobs</button>
+  </div>
+
+  <h2>Variables Form</h2>
+  <form id="vars-form" class="row" onsubmit="return false;">
+    <div class="form-row"><label>Job1:</label><input type="text" name="Job1" value="JobTest1" /></div>
+    <div class="form-row"><label>Job2:</label><input type="text" name="Job2" value="JobTest2" /></div>
+    <div class="form-row"><label>Job3:</label><input type="text" name="Job3" value="JobTest3" /></div>
+  </form>
+
+  <h2>Status Summary</h2>
+  <div
+    id="status-summary"
+    hx-get="/jobqueue/dashboard/status"
+    hx-trigger="every 2s"
+    hx-swap="outerHTML"
+  >
+    Loading status...
+  </div>
+
+  <h2>Jobs</h2>
+  <div
+    id="jobs-table"
+    hx-get="/jobqueue/dashboard/jobs"
+    hx-trigger="every 2s"
+    hx-swap="outerHTML"
+  >
+    Loading jobs...
+  </div>
+
+  <h2>Job Detail</h2>
+  <div class="row">
+    <input type="text" name="id" id="job-detail-input" placeholder="Job ID" />
+    <button
+      hx-get="/jobqueue/dashboard/job"
+      hx-vals='js:{id: document.getElementById("job-detail-input").value}'
+      hx-target="#job-detail"
+      hx-swap="outerHTML"
+    >Load by ID</button>
+  </div>
+  <div id="job-detail">Click "View" on a row, or type an ID above.</div>
+
+</body>
+</html>
